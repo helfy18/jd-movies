@@ -1,0 +1,18 @@
+# Xcode
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+DerivedData/
+build/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+.build/
+.swiftpm/
+
+# Local configuration (API keys). Copy Config/Secrets.example.xcconfig to Config/Secrets.xcconfig.
+Config/Secrets.xcconfig
+
+# macOS
+.DS_Store
