@@ -156,7 +156,7 @@ nonisolated struct SiteStats: Hashable, Sendable {
             for name in movie.directors {
                 directors.add(name, score: score)
             }
-            for (billing, name) in movie.cast.enumerated() {
+            for (billing, name) in movie.castNames.enumerated() {
                 actors.add(name, score: score)
                 if billing < topBilling { topBilledActors.add(name, score: score) }
             }

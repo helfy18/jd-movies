@@ -30,8 +30,40 @@ nonisolated struct TMDBGenre: Decodable, Hashable, Sendable {
     var name: String
 }
 
-nonisolated struct TMDBCastMember: Decodable, Hashable, Sendable {
+nonisolated struct TMDBCastMember: Hashable, Sendable {
+    var id: Int
     var name: String
+    var character: String?
+    var profilePath: String?
+
+    init(id: Int = 0, name: String, character: String? = nil, profilePath: String? = nil) {
+        self.id = id
+        self.name = name
+        self.character = character
+        self.profilePath = profilePath
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, character
+        case profilePath = "profile_path"
+    }
+}
+
+nonisolated extension TMDBCastMember: Decodable {
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeInt(forKey: .id)
+        name = try container.decodeString(forKey: .name)
+        character = try container.decodeIfPresent(String.self, forKey: .character)
+        profilePath = try container.decodeIfPresent(String.self, forKey: .profilePath)
+    }
+}
+
+nonisolated extension CastMember {
+    init(_ member: TMDBCastMember) {
+        self.init(name: member.name, character: member.character ?? "",
+                  profilePath: member.profilePath ?? "", tmdbID: member.id)
+    }
 }
 
 nonisolated struct TMDBCrewMember: Decodable, Hashable, Sendable {
@@ -235,7 +267,7 @@ nonisolated extension Movie {
             daniApproved: false,
             plot: detail.overview ?? "",
             poster: TMDBImage.urlString(path: detail.posterPath, size: .w500),
-            cast: (detail.credits?.cast ?? []).prefix(Movie.tmdbCastLimit).map(\.name),
+            cast: (detail.credits?.cast ?? []).prefix(Movie.tmdbCastLimit).map(CastMember.init),
             directors: (detail.credits?.crew ?? []).filter { $0.job == "Director" }.map(\.name),
             ratings: [],
             boxOffice: Movie.groupedNumber(detail.revenue ?? 0),

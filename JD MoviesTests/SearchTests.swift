@@ -4,7 +4,7 @@ import Testing
 
 struct SearchTests {
     private let index = SearchIndex(movies: [
-        .fixture(title: "The Batman", tmdbID: 1, cast: ["Zoë Kravitz"]),
+        .fixture(title: "The Batman", tmdbID: 1, cast: CastMember.names("Zoë Kravitz")),
         .fixture(title: "Amélie", tmdbID: 2, directors: ["Jean-Pierre Jeunet"]),
     ])
 
@@ -23,9 +23,9 @@ struct SearchTests {
 
     @Test func peopleAreRankedByAppearanceCount() {
         let people = SearchIndex(movies: [
-            .fixture(tmdbID: 1, cast: ["Tom Hanks", "Zoë Saldaña"]),
-            .fixture(tmdbID: 2, cast: ["Tom Hanks"], directors: ["Tom Hooper"]),
-            .fixture(tmdbID: 3, cast: ["Tom Hardy"]),
+            .fixture(tmdbID: 1, cast: CastMember.names("Tom Hanks", "Zoë Saldaña")),
+            .fixture(tmdbID: 2, cast: CastMember.names("Tom Hanks"), directors: ["Tom Hooper"]),
+            .fixture(tmdbID: 3, cast: CastMember.names("Tom Hardy")),
         ])
         #expect(people.people(matching: "tom").map(\.name) == ["Tom Hanks", "Tom Hardy", "Tom Hooper"])
         #expect(people.people(matching: "saldana").map(\.name) == ["Zoë Saldaña"])
@@ -34,7 +34,7 @@ struct SearchTests {
     }
 
     @Test func peopleMatchesAreCapped() {
-        let crowd = SearchIndex(movies: (0..<10).map { CompactMovie.fixture(tmdbID: $0, cast: ["Match \($0)"]) })
+        let crowd = SearchIndex(movies: (0..<10).map { CompactMovie.fixture(tmdbID: $0, cast: CastMember.names("Match \($0)")) })
         #expect(crowd.people(matching: "match").count == SearchIndex.personLimit)
     }
 }

@@ -34,12 +34,12 @@ nonisolated struct SearchIndex: Sendable {
 
     init(movies: [CompactMovie]) {
         movieEntries = movies.map { movie in
-            let fields = [movie.title, movie.universe, movie.subUniverse, movie.studio] + movie.cast + movie.directors
+            let fields = [movie.title, movie.universe, movie.subUniverse, movie.studio] + movie.castNames + movie.directors
             return MovieEntry(movie: movie, haystack: fields.map(SearchIndex.fold))
         }
         var counts: [String: Int] = [:]
         for movie in movies {
-            for name in Set(movie.cast + movie.directors) {
+            for name in Set(movie.castNames + movie.directors) {
                 counts[name, default: 0] += 1
             }
         }

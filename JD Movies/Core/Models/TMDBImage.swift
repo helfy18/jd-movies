@@ -3,7 +3,7 @@ import Foundation
 /// Builds `image.tmdb.org` URLs for posters, profile photos and provider logos.
 nonisolated enum TMDBImage {
     nonisolated enum Size: String, Sendable {
-        case w154, w342, w500, w780
+        case w154, w185, w342, w500, w780
     }
 
     private static let base = "https://image.tmdb.org/t/p/"

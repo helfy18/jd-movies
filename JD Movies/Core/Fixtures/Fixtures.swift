@@ -27,7 +27,7 @@ nonisolated extension Movie {
         daniApproved: Bool = false,
         plot: String = "",
         poster: String = "https://image.tmdb.org/t/p/w500/test.jpg",
-        cast: [String] = [],
+        cast: [CastMember] = [],
         directors: [String] = [],
         runtime: Int = 120,
         provider: Providers = .none,
@@ -54,7 +54,7 @@ nonisolated extension CompactMovie {
         poster: String = "https://image.tmdb.org/t/p/w500/test.jpg",
         tmdbID: Int = 1,
         daniApproved: Bool = false,
-        cast: [String] = [],
+        cast: [CastMember] = [],
         directors: [String] = [],
         universe: String = "",
         subUniverse: String = "",
@@ -64,6 +64,17 @@ nonisolated extension CompactMovie {
         CompactMovie(title: title, score: score, poster: poster, tmdbID: tmdbID, daniApproved: daniApproved,
                      cast: cast, directors: directors, universe: universe, subUniverse: subUniverse,
                      studio: studio, year: year)
+    }
+}
+
+nonisolated extension CastMember {
+    /// Name-only members, the shape compact lists and pre-migration documents carry.
+    static func names(_ names: String...) -> [CastMember] {
+        names.map { CastMember(name: $0) }
+    }
+
+    static func names(_ names: [String]) -> [CastMember] {
+        names.map { CastMember(name: $0) }
     }
 }
 

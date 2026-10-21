@@ -61,8 +61,8 @@ struct SiteStatsTests {
 
     @Test func onlyTopBilledRolesCountTowardActorAverages() {
         let filler = (0..<10).map { "Filler \($0)" }
-        let movies = (0..<5).map { Movie.fixture(score: 90, cast: filler + ["Cameo King"], tmdbID: $0) }
-            + [.fixture(score: 90, cast: ["Cameo King"], tmdbID: 99)]
+        let movies = (0..<5).map { Movie.fixture(score: 90, cast: CastMember.names(filler + ["Cameo King"]), tmdbID: $0) }
+            + [.fixture(score: 90, cast: CastMember.names("Cameo King"), tmdbID: 99)]
         let stats = SiteStats.build(from: movies)
         #expect(!stats.actors.best.map(\.name).contains("Cameo King"))
         #expect(!stats.actors.worst.map(\.name).contains("Cameo King"))
@@ -131,8 +131,8 @@ struct SiteStatsTests {
     }
 
     @Test func ranksBestWorstAndMostWatchedIndependently() {
-        let movies = (0..<5).map { Movie.fixture(score: 95, cast: ["Great", "Busy"], tmdbID: $0) }
-            + (0..<5).map { Movie.fixture(score: 20, cast: ["Rough", "Busy"], tmdbID: 10 + $0) }
+        let movies = (0..<5).map { Movie.fixture(score: 95, cast: CastMember.names("Great", "Busy"), tmdbID: $0) }
+            + (0..<5).map { Movie.fixture(score: 20, cast: CastMember.names("Rough", "Busy"), tmdbID: 10 + $0) }
         let stats = SiteStats.build(from: movies)
         #expect(stats.actors.best.first?.name == "Great")
         #expect(stats.actors.worst.first?.name == "Rough")

@@ -4,9 +4,6 @@ import SwiftUI
 struct MovieInfoSection: View {
     let movie: Movie
 
-    @State private var castExpanded = false
-    private static let collapsedCastCount = 6
-
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             row("Title") {
@@ -49,7 +46,6 @@ struct MovieInfoSection: View {
             if let boxOffice = money(movie.boxOffice) {
                 row("Box Office") { Text(boxOffice) }
             }
-            castRow
             chipRow(movie.directors.count > 1 ? "Directors" : "Director", values: movie.directors) {
                 .person($0)
             }
@@ -58,33 +54,6 @@ struct MovieInfoSection: View {
             }
         }
         .card()
-    }
-
-    @ViewBuilder
-    private var castRow: some View {
-        if !movie.cast.isEmpty {
-            let collapsible = movie.cast.count > Self.collapsedCastCount
-            let visible = castExpanded || !collapsible ? movie.cast : Array(movie.cast.prefix(Self.collapsedCastCount))
-            row("Actors") {
-                VStack(alignment: .leading, spacing: 6) {
-                    FlowLayout {
-                        ForEach(visible, id: \.self) { name in
-                            ChipLink(text: name, route: .person(name))
-                        }
-                    }
-                    if collapsible {
-                        Button {
-                            withAnimation { castExpanded.toggle() }
-                        } label: {
-                            Label(castExpanded ? "Show less" : "Show all \(movie.cast.count)",
-                                  systemImage: castExpanded ? "chevron.up" : "chevron.down")
-                                .font(.footnote)
-                                .foregroundStyle(.appMuted)
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private func row<Value: View>(_ label: String, @ViewBuilder value: () -> Value) -> some View {

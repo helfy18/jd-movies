@@ -69,6 +69,9 @@ struct MovieDetailView: View {
             }
             OtherSiteReviews(movie: movie)
                 .padding(.horizontal)
+            if !movie.cast.isEmpty {
+                CastSection(cast: movie.cast)
+            }
             if !model.recommended.isEmpty {
                 PosterRow(title: "More Like This", movies: model.recommended)
             }
@@ -137,7 +140,9 @@ struct TextBlock: View {
         title: "Heat", score: 92, universe: "", genre: "Crime", genre2: "Thriller", studio: "Warner Bros.",
         year: 1995, review: "A masterpiece of the genre.", ranking: 12, daniApproved: true,
         plot: "A group of high-end professional thieves start to feel the heat from the LAPD.",
-        cast: ["Al Pacino", "Robert De Niro", "Val Kilmer", "Jon Voight", "Tom Sizemore", "Diane Venora", "Amy Brenneman", "Ashley Judd"],
+        cast: [CastMember(name: "Al Pacino", character: "Lt. Vincent Hanna", tmdbID: 1158),
+               CastMember(name: "Robert De Niro", character: "Neil McCauley", tmdbID: 380),
+               CastMember(name: "Val Kilmer", character: "Chris Shiherlis", tmdbID: 5576)],
         directors: ["Michael Mann"], runtime: 170,
         provider: Providers(link: "", rent: [.fixture(id: 2, name: "Apple TV")], flatrate: [.fixture(id: 8, name: "Netflix")], buy: [], ads: [], free: []),
         tmdbID: 949, rottenTomatoes: "87%", imdb: "8.3/10", metacritic: "76/100"

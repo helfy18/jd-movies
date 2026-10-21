@@ -11,7 +11,9 @@ struct DecodingTests {
         let json = """
         {"movie":"Heat","jh_score":92,"universe":"","sub_universe":"","genre":"Crime","genre_2":"","holiday":"","exclusive":"",
          "studio":"Warner Bros.","year":1995,"review":"","ranking":12,"dani_approved":true,"plot":"Cops and robbers.",
-         "poster":"https://image.tmdb.org/t/p/w500/heat.jpg","cast":["Al Pacino","Robert De Niro"],"directors":null,"ratings":null,
+         "poster":"https://image.tmdb.org/t/p/w500/heat.jpg",
+         "cast":[{"name":"Al Pacino","character":"Lt. Vincent Hanna","profile_path":"/pacino.jpg","tmdbid":1158},{"name":"Robert De Niro"}],
+         "directors":null,"ratings":null,
          "boxoffice":"187,436,818","rated":"R","runtime":170,
          "provider":{"link":"https://www.justwatch.com/us/movie/heat","rent":[{"logo_path":"/a.jpg","provider_id":2,"provider_name":"Apple TV","display_priority":5}],
                      "flatrate":null,"buy":null,"ads":null,"free":null},
@@ -20,7 +22,11 @@ struct DecodingTests {
         let movie = try decode(Movie.self, json)
         #expect(movie.title == "Heat")
         #expect(movie.ranking == 12)
-        #expect(movie.cast == ["Al Pacino", "Robert De Niro"])
+        #expect(movie.castNames == ["Al Pacino", "Robert De Niro"])
+        #expect(movie.cast.first?.character == "Lt. Vincent Hanna")
+        #expect(movie.cast.first?.photoURL?.absoluteString == "https://image.tmdb.org/t/p/w185/pacino.jpg")
+        #expect(movie.cast.last == CastMember(name: "Robert De Niro"))
+        #expect(movie.cast.last?.photoURL == nil)
         #expect(movie.directors.isEmpty && movie.ratings.isEmpty && movie.recommendations.isEmpty)
         #expect(movie.provider.rent.first?.providerName == "Apple TV")
         #expect(movie.provider.flatrate.isEmpty)
@@ -31,13 +37,13 @@ struct DecodingTests {
     @Test func compactMoviesDecodeFromTheSameShape() throws {
         let json = """
         [{"movie":"Up","jh_score":88,"universe":"","sub_universe":"","genre":"","genre_2":"","holiday":"","exclusive":"","studio":"Pixar",
-          "year":2009,"review":"","ranking":0,"dani_approved":false,"plot":"","poster":"p","cast":null,"directors":["Pete Docter"],"ratings":null,
+          "year":2009,"review":"","ranking":0,"dani_approved":false,"plot":"","poster":"p","cast":[{"name":"Ed Asner"}],"directors":["Pete Docter"],"ratings":null,
           "boxoffice":"","rated":"","runtime":0,"provider":{"link":"","rent":null,"flatrate":null,"buy":null,"ads":null,"free":null},
           "budget":"","tmdbid":14160,"recommendations":null,"rottentomatoes":"","imdb":"","metacritic":"","trailer":""}]
         """
         let compact = try decode([CompactMovie].self, json)
         #expect(compact.first?.directors == ["Pete Docter"])
-        #expect(compact.first?.cast.isEmpty == true)
+        #expect(compact.first?.castNames == ["Ed Asner"])
         #expect(compact.first?.studio == "Pixar")
     }
 
@@ -61,7 +67,8 @@ struct DecodingTests {
         let json = """
         {"adult":false,"budget":5,"genres":[{"id":1,"name":"Drama"},{"id":2,"name":"War"}],"id":42,"overview":"x","poster_path":"/d.jpg",
          "release_date":"2019-07-04","revenue":1234567,"runtime":null,"title":"Detail",
-         "credits":{"cast":[{"name":"A"},{"name":"B"}],"crew":[{"name":"Dir","job":"Director"},{"name":"Prod","job":"Producer"}]},
+         "credits":{"cast":[{"id":1,"name":"A","character":"Lead","profile_path":"/a.jpg"},{"id":2,"name":"B","character":null,"profile_path":null}],
+                    "crew":[{"name":"Dir","job":"Director"},{"name":"Prod","job":"Producer"}]},
          "videos":{"results":[{"key":"k1","site":"YouTube","type":"Teaser"},{"key":"k2","site":"YouTube","type":"Trailer"}]},
          "watch/providers":{"results":{"US":{"link":"https://jw","flatrate":[{"logo_path":"/n.jpg","provider_id":8,"provider_name":"Netflix","display_priority":1}]}}},
          "release_dates":{"results":[{"iso_3166_1":"US","release_dates":[{"certification":""},{"certification":"PG-13"}]}]},
@@ -71,6 +78,8 @@ struct DecodingTests {
         #expect(movie.genre == "Drama" && movie.genre2 == "War")
         #expect(movie.year == 2019)
         #expect(movie.directors == ["Dir"])
+        #expect(movie.cast == [CastMember(name: "A", character: "Lead", profilePath: "/a.jpg", tmdbID: 1),
+                               CastMember(name: "B", tmdbID: 2)])
         #expect(movie.rated == "PG-13")
         #expect(movie.trailer == "https://www.youtube.com/embed/k2")
         #expect(movie.provider.flatrate.first?.providerID == 8)

@@ -22,6 +22,40 @@ nonisolated struct ProviderInfo: Codable, Hashable, Sendable, Identifiable {
     }
 }
 
+/// One credited actor, in TMDB billing order. Compact lists carry only the name.
+nonisolated struct CastMember: Hashable, Sendable, Identifiable {
+    var name: String
+    var character: String
+    var profilePath: String
+    var tmdbID: Int
+
+    var id: String { "\(tmdbID)-\(name)" }
+    var photoURL: URL? { TMDBImage.url(path: profilePath, size: .w185) }
+
+    init(name: String, character: String = "", profilePath: String = "", tmdbID: Int = 0) {
+        self.name = name
+        self.character = character
+        self.profilePath = profilePath
+        self.tmdbID = tmdbID
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case name, character
+        case profilePath = "profile_path"
+        case tmdbID = "tmdbid"
+    }
+}
+
+nonisolated extension CastMember: Codable {
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        name = try container.decodeString(forKey: .name)
+        character = try container.decodeString(forKey: .character)
+        profilePath = try container.decodeString(forKey: .profilePath)
+        tmdbID = try container.decodeInt(forKey: .tmdbID)
+    }
+}
+
 /// Where a movie can be streamed, rented or bought (sourced from JustWatch via TMDB).
 nonisolated struct Providers: Hashable, Sendable {
     var link: String
@@ -78,7 +112,7 @@ nonisolated struct Movie: Hashable, Sendable, Identifiable {
     var daniApproved: Bool
     var plot: String
     var poster: String
-    var cast: [String]
+    var cast: [CastMember]
     var directors: [String]
     var ratings: [Rating]
     var boxOffice: String
@@ -96,6 +130,7 @@ nonisolated struct Movie: Hashable, Sendable, Identifiable {
     var id: Int { tmdbID }
     var isRated: Bool { score != Movie.unratedScore }
     var genres: [String] { [genre, genre2].filter { !$0.isEmpty } }
+    var castNames: [String] { cast.map(\.name) }
     /// The sub-universe when set, otherwise the universe (used for franchise stats).
     var franchise: String? { subUniverse.nonEmpty ?? universe.nonEmpty }
     var trailerURL: URL? { URL(string: trailer) }
@@ -177,7 +212,7 @@ nonisolated struct CompactMovie: Hashable, Sendable, Identifiable {
     var poster: String
     var tmdbID: Int
     var daniApproved: Bool
-    var cast: [String]
+    var cast: [CastMember]
     var directors: [String]
     var universe: String
     var subUniverse: String
@@ -185,6 +220,7 @@ nonisolated struct CompactMovie: Hashable, Sendable, Identifiable {
     var year: Int
 
     var id: Int { tmdbID }
+    var castNames: [String] { cast.map(\.name) }
 
     enum CodingKeys: String, CodingKey {
         case title = "movie"

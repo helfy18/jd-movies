@@ -121,7 +121,7 @@ struct MovieGridView: View {
 #if DEBUG
 #Preview {
     let ratings = StubRatingsService(
-        onCompactList: { _ in (1...30).map { CompactMovie.fixture(title: "Movie \($0)", score: 100 - $0 * 2, tmdbID: $0, cast: ["Actor \($0 % 4)"]) } },
+        onCompactList: { _ in (1...30).map { CompactMovie.fixture(title: "Movie \($0)", score: 100 - $0 * 2, tmdbID: $0, cast: CastMember.names("Actor \($0 % 4)")) } },
         onFilterTypes: { .fixture() }
     )
     NavigationStack {

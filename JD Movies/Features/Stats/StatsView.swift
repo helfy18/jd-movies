@@ -111,7 +111,7 @@ struct StatsView: View {
         (1...60).map {
             Movie.fixture(title: "Movie \($0)", score: 40 + ($0 * 7) % 60, universe: $0 % 3 == 0 ? "Marvel" : "",
                           genre: ["Action", "Comedy", "Drama"][$0 % 3], year: 1980 + $0 % 45, ranking: $0,
-                          daniApproved: $0 % 4 == 0, cast: ["Actor \($0 % 5)", "Actor \($0 % 7)"],
+                          daniApproved: $0 % 4 == 0, cast: CastMember.names("Actor \($0 % 5)", "Actor \($0 % 7)"),
                           directors: ["Director \($0 % 6)"], tmdbID: $0, imdb: "\(5 + $0 % 5).0/10")
         }
     })
